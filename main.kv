@@ -1,17 +1,13 @@
-#:include kv/mapscreen.kv
+#:include kv/homescreen.kv
+#:include kv/settingsscreen.kv
 
-FloatLayout:
-    GridLayout:
-        canvas:
-            Color:
-                rgb: wn_colors.sl
-            Rectangle:
-                size: self.size
-                pos: self.pos
+GridLayout:
+    cols: 1
     ScreenManager:
         id: screen_manager
-        pos_hint: {"top": .845, "left": 1}
-        size_hint: 1, .845
-        MapScreen:
-            id: map_screen
-            name: "map_screen"
+        HomeScreen:
+            name: "home_screen"
+            id: home_screen
+        SettingsScreen:
+            name: "settings_screen"
+            id: settings_screen
