@@ -1,0 +1,17 @@
+#:include kv/mapscreen.kv
+
+FloatLayout:
+    GridLayout:
+        canvas:
+            Color:
+                rgb: wn_colors.sl
+            Rectangle:
+                size: self.size
+                pos: self.pos
+    ScreenManager:
+        id: screen_manager
+        pos_hint: {"top": .845, "left": 1}
+        size_hint: 1, .845
+        MapScreen:
+            id: map_screen
+            name: "map_screen"
