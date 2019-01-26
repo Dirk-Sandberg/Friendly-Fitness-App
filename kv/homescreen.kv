@@ -1,8 +1,73 @@
+#:import utils kivy.utils
+
 
 <HomeScreen>:
-    Button:
-        text:
-            "You are at the home screen"
-        on_release:
-            app.change_screen("settings_screen")
+    FloatLayout:
+        canvas:
+            Color:
+                rgb: utils.get_color_from_hex("#39B3F2")
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        GridLayout:
+            # Put two weather icons here
+            rows: 1
+            pos_hint: {"top": 1, "left": 1}
+            size_hint: 1, .1
+            Image:
+                source: "icons/002-sunrise.png"
+            Image:
+                source: "icons/001-sun.png"
+        GridLayout:
+            # Put two weather icons and avatar icon
+            rows: 1
+            pos_hint: {"top": .9, "left": 1}
+            size_hint: 1, .2
+            Image:
+                source: "icons/003-sunset.png"
+            Image:
+                source: "icons/man.png"
+            Image:
+                source: "icons/007-crescent-moon.png"
+        Label:
+            # Streak label
+            pos_hint: {"top": .7, "left": 1}
+            size_hint: 1, .1
+            text: "12 Day Streak"
+            id: streak_label
+        GridLayout:
+            # Banner grid
+            cols: 1
+            pos_hint: {"top": .6, "left": 1}
+            size_hint: 1, .4
+        GridLayout:
+            # Add 3 Menu buttons here
+            rows: 1
+            pos_hint: {"top": .2, "left": 1}
+            size_hint: 1, .2
+            ImageButton:
+                source: "icons/007-add-friend.png"
+                on_release:
+                    print("RELEASED ADD FRIEND BUTTON")
+            ImageButton:
+                source: "icons/football.png"
+                on_release:
+                    print("RELEASED FOOTBALL BUTTON")
+            ImageButton:
+                source: "icons/ice-hockey.png"
+                on_press:
+                    self.source = "icons/boy.png"
+                on_release:
+                    self.source = "icons/ice-hockey.png"
+                    print("RELEASED ICE HOCKEY BUTTON")
+
+
+
+
+
+
+
+
+
+
 
