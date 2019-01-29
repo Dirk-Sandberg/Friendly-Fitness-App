@@ -27,19 +27,27 @@
                 source: "icons/003-sunset.png"
             Image:
                 source: "icons/man.png"
+                id: avatar_image
             Image:
                 source: "icons/007-crescent-moon.png"
         Label:
             # Streak label
             pos_hint: {"top": .7, "left": 1}
             size_hint: 1, .1
-            text: "12 Day Streak"
+            text: ""
             id: streak_label
-        GridLayout:
-            # Banner grid
-            cols: 1
+        ScrollView:
             pos_hint: {"top": .6, "left": 1}
             size_hint: 1, .4
+            GridLayout:
+                # Banner grid
+                id: banner_grid
+                cols: 1
+                spacing: 10,10
+                size_hint_y: None
+                height: self.minimum_height
+                row_default_height: '100dp'
+                row_force_default: True
         GridLayout:
             # Add 3 Menu buttons here
             rows: 1
@@ -54,12 +62,7 @@
                 on_release:
                     print("RELEASED FOOTBALL BUTTON")
             ImageButton:
-                source: "icons/ice-hockey.png"
-                on_press:
-                    self.source = "icons/boy.png"
-                on_release:
-                    self.source = "icons/ice-hockey.png"
-                    print("RELEASED ICE HOCKEY BUTTON")
+                source: "icons/ice-hockey.png" if self.state=='normal' else "icons/boy.png"
 
 
 
