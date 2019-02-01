@@ -16,9 +16,8 @@
             size_hint: .5, .2
             pos_hint: {"top": .7, "left": 1}
             source: "icons/avatars/man.png"
-            # test
             on_release:
-                print("Change avatar")
+                app.change_screen("change_avatars_screen")
         LabelButton:
             size_hint: .3, .2
             pos_hint: {"top": .7, "right": .8}

@@ -2,8 +2,10 @@ from kivy.app import App
 from kivy.lang import Builder
 from kivy.uix.screenmanager import Screen
 from kivy.uix.button import ButtonBehavior
+from os import walk
 from kivy.uix.image import Image
 from workoutbanner import WorkoutBanner
+from functools import partial
 from kivy.uix.label import Label
 import requests
 import json
@@ -18,6 +20,8 @@ class LabelButton(ButtonBehavior, Label):
 class ImageButton(ButtonBehavior, Image):
     pass
 
+class ChangeAvatarsScreen(Screen):
+    pass
 
 class SettingsScreen(Screen):
     pass
@@ -31,11 +35,19 @@ class MainApp(App):
         return GUI
 
     def on_start(self):
+        avatar_grid = self.root.ids['change_avatars_screen'].ids['avatar_grid']
+        for root, dirs, files in walk("icons/avatars"):
+            for image in files:
+                im = "icons/avatars/" + image
+                button = ImageButton(source=im, on_release=partial(self.change_avatar, im))
+                avatar_grid.add_widget(button)
+
 
 
         # Get database data
         result = requests.get("https://friendly-fitness.firebaseio.com/" + str(self.my_friend_id) + ".json")
         data = json.loads(result.content.decode())
+
         # Get and update avatar image
         avatar_image = self.root.ids['avatar_image']
         avatar_image.source = "icons/avatars/" + data['avatar']
@@ -62,6 +74,14 @@ class MainApp(App):
                 banner_grid.add_widget(W)
 
 
+    def change_avatar(self, new_avatar, widget_id):
+        avatar_image = self.root.ids['avatar_image']
+        avatar_image.source = new_avatar
+        post_data = '{"avatar": "%s"}' %new_avatar.split("/")[-1]
+        print(post_data)
+        req = requests.patch("https://friendly-fitness.firebaseio.com/" + str(self.my_friend_id)+".json", data=post_data)
+        print(req)
+        print(req.content)
 
 
     def change_screen(self, screen_name):

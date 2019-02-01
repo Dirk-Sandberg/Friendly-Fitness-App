@@ -1,0 +1,18 @@
+<ChangeAvatarsScreen>:
+    canvas:
+        Color:
+            rgb: utils.get_color_from_hex("#39B3F2")
+        Rectangle:
+            size: self.size
+            pos: self.pos
+    ScrollView:
+
+        GridLayout:
+            cols: 3
+            id: avatar_grid
+            size_hint_y: None
+            height: self.minimum_height
+            row_default_height: '100dp'
+            row_force_default: True
+            spacing: 20, 20
+            padding: 20, 20
