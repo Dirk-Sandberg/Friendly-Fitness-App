@@ -5,6 +5,8 @@ from kivy.uix.button import ButtonBehavior
 from kivy.uix.image import Image
 from workoutbanner import WorkoutBanner
 from kivy.uix.label import Label
+from functools import partial
+from os import walk
 import requests
 import json
 
@@ -23,6 +25,9 @@ class SettingsScreen(Screen):
     pass
 
 
+class ChangeAvatarScreen(Screen):
+    pass
+
 GUI = Builder.load_file("main.kv")  # Make sure this is after all class definitions!
 class MainApp(App):
     my_friend_id = 1
@@ -36,9 +41,18 @@ class MainApp(App):
         # Get database data
         result = requests.get("https://friendly-fitness.firebaseio.com/" + str(self.my_friend_id) + ".json")
         data = json.loads(result.content.decode())
+
         # Get and update avatar image
         avatar_image = self.root.ids['avatar_image']
         avatar_image.source = "icons/avatars/" + data['avatar']
+
+        # Populate avatar grid
+        avatar_grid = self.root.ids['change_avatar_screen'].ids['avatar_grid']
+        for root_dir, folders, files in walk("icons/avatars"):
+            for f in files:
+                img = ImageButton(source="icons/avatars/" + f, on_release=partial(self.change_avatar, f))
+                avatar_grid.add_widget(img)
+
 
 
         # Get and update streak label
@@ -62,6 +76,19 @@ class MainApp(App):
                 banner_grid.add_widget(W)
 
 
+
+    def change_avatar(self, image, widget_id):
+        # Change avatar in the app
+        avatar_image = self.root.ids['avatar_image']
+        avatar_image.source = "icons/avatars/" + image
+
+
+        # Change avatar in firebase database
+        my_data = '{"avatar": "%s"}' % image
+        requests.patch("https://friendly-fitness.firebaseio.com/" + str(self.my_friend_id) + ".json",
+                       data=my_data)
+
+        self.change_screen("settings_screen")
 
 
     def change_screen(self, screen_name):
