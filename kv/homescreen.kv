@@ -9,36 +9,15 @@
             Rectangle:
                 size: self.size
                 pos: self.pos
-        GridLayout:
-            # Put two weather icons here
-            rows: 1
-            pos_hint: {"top": 1, "left": 1}
-            size_hint: 1, .1
-            Image:
-                source: "icons/002-sunrise.png"
-            Image:
-                source: "icons/001-sun.png"
-        GridLayout:
-            # Put two weather icons and avatar icon
-            rows: 1
-            pos_hint: {"top": .9, "left": 1}
-            size_hint: 1, .2
-            Image:
-                source: "icons/003-sunset.png"
-            Image:
-                source: "icons/man.png"
-                id: avatar_image
-            Image:
-                source: "icons/007-crescent-moon.png"
         Label:
             # Streak label
-            pos_hint: {"top": .7, "left": 1}
+            pos_hint: {"top": 1, "left": 1}
             size_hint: 1, .1
             text: ""
             id: streak_label
         ScrollView:
-            pos_hint: {"top": .6, "left": 1}
-            size_hint: 1, .4
+            pos_hint: {"top": .9, "left": 1}
+            size_hint: 1, .75
             GridLayout:
                 # Banner grid
                 id: banner_grid
@@ -51,18 +30,20 @@
         GridLayout:
             # Add 3 Menu buttons here
             rows: 1
-            pos_hint: {"top": .2, "left": 1}
-            size_hint: 1, .2
+            pos_hint: {"top": .15, "left": 1}
+            size_hint: 1, .15
             ImageButton:
-                source: "icons/007-add-friend.png"
+                source: "icons/add.png"
                 on_release:
-                    print("RELEASED ADD FRIEND BUTTON")
+                    print("RELEASED NEW WORKOUT BUTTON")
             ImageButton:
-                source: "icons/football.png"
+                source: "icons/friends_list.png"
                 on_release:
-                    print("RELEASED FOOTBALL BUTTON")
+                    print("RELEASED FRIEND'S LIST BUTTON")
             ImageButton:
-                source: "icons/ice-hockey.png" if self.state=='normal' else "icons/boy.png"
+                source: "icons/settings.png" if self.state=='normal' else "icons/boy.png"
+                on_release:
+                    app.change_screen("settings_screen")
 
 
 

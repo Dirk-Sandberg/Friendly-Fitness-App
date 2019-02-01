@@ -3,11 +3,53 @@
 
 GridLayout:
     cols: 1
-    ScreenManager:
-        id: screen_manager
-        HomeScreen:
-            name: "home_screen"
-            id: home_screen
-        SettingsScreen:
-            name: "settings_screen"
-            id: settings_screen
+    FloatLayout:
+        GridLayout:
+            canvas:
+                Color:
+                    rgb: utils.get_color_from_hex("#39B3F2")
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
+            # Put two weather icons here
+            rows: 1
+            pos_hint: {"top": 1, "left": 1}
+            size_hint: 1, .05
+            Image:
+                source: "icons/001-sun.png"
+            Image:
+                source: "icons/003-sunset.png"
+        FloatLayout:
+            canvas:
+                Color:
+                    rgb: utils.get_color_from_hex("#39B3F2")
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
+            # Put two weather icons and avatar icon
+            rows: 1
+            pos_hint: {"top": .95, "left": 1}
+            size_hint: 1, .15
+            Image:
+                source: "icons/002-sunrise.png"
+                size_hint: 0.25, 0.5
+                pos_hint: {"top": 1, "right": 0.25}
+            Image:
+                source: "icons/man.png"
+                id: avatar_image
+                size_hint: 0.5, 1
+                pos_hint: {"top": 1, "right": 0.75}
+            Image:
+                source: "icons/007-crescent-moon.png"
+                size_hint: 0.25, 0.5
+                pos_hint: {"top": 1, "right": 1}
+        ScreenManager:
+            size_hint: 1, 0.799
+            pos_hint: {"top": .799, "left": 1}
+            id: screen_manager
+            HomeScreen:
+                name: "home_screen"
+                id: home_screen
+            SettingsScreen:
+                name: "settings_screen"
+                id: settings_screen

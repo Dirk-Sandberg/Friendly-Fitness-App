@@ -4,6 +4,7 @@ from kivy.uix.screenmanager import Screen
 from kivy.uix.button import ButtonBehavior
 from kivy.uix.image import Image
 from workoutbanner import WorkoutBanner
+from kivy.uix.label import Label
 import requests
 import json
 
@@ -11,6 +12,8 @@ import json
 class HomeScreen(Screen):
     pass
 
+class LabelButton(ButtonBehavior, Label):
+    pass
 
 class ImageButton(ButtonBehavior, Image):
     pass
@@ -28,16 +31,25 @@ class MainApp(App):
         return GUI
 
     def on_start(self):
+
+
         # Get database data
         result = requests.get("https://friendly-fitness.firebaseio.com/" + str(self.my_friend_id) + ".json")
         data = json.loads(result.content.decode())
         # Get and update avatar image
-        avatar_image = self.root.ids['home_screen'].ids['avatar_image']
-        avatar_image.source = "icons/" + data['avatar']
+        avatar_image = self.root.ids['avatar_image']
+        avatar_image.source = "icons/avatars/" + data['avatar']
+
 
         # Get and update streak label
         streak_label = self.root.ids['home_screen'].ids['streak_label']
         streak_label.text = str(data['streak']) + " Day Streak!"
+
+        # Get and update friend id label
+        friend_id_label = self.root.ids['settings_screen'].ids['friend_id_label']
+        friend_id_label.text = "Friend ID: " + str(self.my_friend_id)
+
+
 
         banner_grid = self.root.ids['home_screen'].ids['banner_grid']
         workouts = data['workouts'][1:]
