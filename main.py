@@ -7,6 +7,7 @@ from workoutbanner import WorkoutBanner
 from kivy.uix.label import Label
 from functools import partial
 from os import walk
+from myfirebase import MyFirebase
 import requests
 import json
 
@@ -18,6 +19,9 @@ class LabelButton(ButtonBehavior, Label):
     pass
 
 class ImageButton(ButtonBehavior, Image):
+    pass
+
+class LoginScreen(Screen):
     pass
 
 
@@ -32,7 +36,7 @@ GUI = Builder.load_file("main.kv")  # Make sure this is after all class definiti
 class MainApp(App):
     my_friend_id = 1
     def build(self):
-
+        self.my_firebase = MyFirebase()
         return GUI
 
     def on_start(self):

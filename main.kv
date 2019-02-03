@@ -1,6 +1,7 @@
 #:include kv/homescreen.kv
 #:include kv/settingsscreen.kv
 #:include kv/changeavatarscreen.kv
+#:include kv/loginscreen.kv
 
 GridLayout:
     cols: 1
@@ -48,6 +49,9 @@ GridLayout:
             size_hint: 1, 0.799
             pos_hint: {"top": .799, "left": 1}
             id: screen_manager
+            LoginScreen:
+                name: "login_screen"
+                id: login_screen
             HomeScreen:
                 name: "home_screen"
                 id: home_screen
