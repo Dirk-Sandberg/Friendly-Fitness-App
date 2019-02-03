@@ -32,10 +32,21 @@ class MyFirebase():
 
             # Create new key in database from localId
             # Get friend ID
+            # Get request on firebase to get the next friend id
+            friend_get_req = requests.get("https://friendly-fitness.firebaseio.com/next_friend_id.json?auth=" + idToken)
+            my_friend_id = friend_get_req.json()
+            friend_patch_data = '{"next_friend_id": %s}' % str(my_friend_id+1)
+            friend_patch_req = requests.patch("https://friendly-fitness.firebaseio.com/.json?auth=" + idToken,
+                                              data=friend_patch_data)
+
+
+            print("friend ", friend_get_req.json())
+            # Update firebase's next friend id field
+            # Default streak
             # Default avatar
             # Friends list
             # Empty workouts area
-            my_data = '{"avatar": "man.png", "friends": "", "workouts": ""}'
+            my_data = '{"avatar": "man.png", "friends": "", "workouts": "", "streak": "0", "my_friend_id": %s}'% my_friend_id
             post_request = requests.patch("https://friendly-fitness.firebaseio.com/" + localId + ".json?auth=" + idToken,
                            data=my_data)
             print(post_request.ok)
@@ -52,5 +63,12 @@ class MyFirebase():
 
         pass
 
-    def sign_in(self):
-        pass
+    def exchange_refresh_token(self, refresh_token):
+        refresh_url = "https://securetoken.googleapis.com/v1/token?key=" + self.wak
+        refresh_payload = '{"grant_type": "refresh_token", "refresh_token": "%s"}' % refresh_token
+        refresh_req = requests.post(refresh_url, data=refresh_payload)
+        print("REFRESH OK?", refresh_req.ok)
+        print(refresh_req.json())
+        id_token = refresh_req.json()['id_token']
+        local_id = refresh_req.json()['user_id']
+        return id_token, local_id
