@@ -15,6 +15,9 @@ import json
 class HomeScreen(Screen):
     pass
 
+class AddFriendScreen(Screen):
+    pass
+
 class LabelButton(ButtonBehavior, Label):
     pass
 
@@ -54,6 +57,8 @@ class MainApp(App):
                 refresh_token = f.read()
             # Use refresh token to get a new idToken
             id_token, local_id = self.my_firebase.exchange_refresh_token(refresh_token)
+            self.local_id = local_id
+            self.id_token = id_token
 
             # Get database data
             result = requests.get("https://friendly-fitness.firebaseio.com/" + local_id + ".json?auth=" + id_token)
@@ -64,6 +69,9 @@ class MainApp(App):
             # Get and update avatar image
             avatar_image = self.root.ids['avatar_image']
             avatar_image.source = "icons/avatars/" + data['avatar']
+
+            # Get friends list
+            self.friends_list = data['friends']
 
             # Get and update streak label
             streak_label = self.root.ids['home_screen'].ids['streak_label']
@@ -87,14 +95,33 @@ class MainApp(App):
             self.change_screen("home_screen")
             self.root.ids['screen_manager'].transition = CardTransition()
 
-
-
-
         except Exception as e:
             print(e)
             pass
 
+    def add_friend(self, friend_id):
+        # Query database and make sure friend_id exists
+        check_req = requests.get('https://friendly-fitness.firebaseio.com/.json?orderBy="my_friend_id"&equalTo=' + friend_id)
+        data = check_req.json()
 
+        if data == {}:
+            # If it doesn't, display it doesn't in the message on the add friend screen
+            self.root.ids['add_friend_screen'].ids['add_friend_label'].text = "Invalid friend ID"
+        else:
+            key = data.keys()[0]
+            new_friend_id = data[key]['my_friend_id']
+            self.root.ids['add_friend_screen'].ids['add_friend_label'].text = "Friend ID %s added successfully."%friend_id
+            # Add friend id to friends list and patch new friends list
+            self.friends_list += ", %s"  % friend_id
+            patch_data = '{"friends": "%s"}' %self.friends_list
+            patch_req = requests.patch("https://friendly-fitness.firebaseio.com/%s.json?auth=%s" % (self.local_id, self.id_token),
+                                       data=patch_data)
+            print(patch_req.ok)
+            print(patch_req.json())
+
+
+        # If it does, display "success"
+        # If it does, add to friends list
 
     def change_avatar(self, image, widget_id):
         # Change avatar in the app

@@ -1,0 +1,31 @@
+<AddFriendScreen>:
+    canvas:
+        Color:
+            rgb: utils.get_color_from_hex("#39B3F2")
+        Rectangle:
+            size: self.size
+            pos: self.pos
+    FloatLayout:
+        TextInput:
+            id: add_friend_input
+            hint_text: "Type friend id here"
+            size_hint: .8, .1
+            pos_hint: {"top": .8, "right": .9}
+        Label:
+            id: add_friend_label
+            size_hint: .8, .1
+            pos_hint: {"top": .5, "right": .9}
+        ImageButton:
+            source: "icons/back.png"
+            size_hint: .5, .2
+            pos_hint: {"top": .2, "right": .5}
+            on_release:
+                app.change_screen("settings_screen")
+        ImageButton:
+            source: "icons/next-1.png"
+            size_hint: .5, .15
+            pos_hint: {"top": .2, "right": 1}
+            on_release:
+                app.add_friend(add_friend_input.text)
+
+
