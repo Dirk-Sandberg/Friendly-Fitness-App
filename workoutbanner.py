@@ -25,7 +25,7 @@ class WorkoutBanner(GridLayout):
 
         # Need middle FloatLayout
         middle = FloatLayout()
-        middle_image = Image(source="icons/" + kwargs['type_image'], size_hint=(1, 0.8), pos_hint={"top": 1, "right": 1})
+        middle_image = Image(source=kwargs['type_image'], size_hint=(1, 0.8), pos_hint={"top": 1, "right": 1})
         middle_label = Label(text=str(kwargs['number']) + " " + kwargs['units'], size_hint=(1, .2), pos_hint={"top": .2, "right": 1})
         middle.add_widget(middle_image)
         middle.add_widget(middle_label)

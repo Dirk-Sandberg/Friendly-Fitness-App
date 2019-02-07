@@ -35,7 +35,8 @@ class MyFirebase():
             # Get request on firebase to get the next friend id
             friend_get_req = requests.get("https://friendly-fitness.firebaseio.com/next_friend_id.json?auth=" + idToken)
             my_friend_id = friend_get_req.json()
-            friend_patch_data = '{"next_friend_id": %s}' % str(my_friend_id+1)
+            print(my_friend_id)
+            friend_patch_data = '{"next_friend_id": %s}' % (my_friend_id+1)
             friend_patch_req = requests.patch("https://friendly-fitness.firebaseio.com/.json?auth=" + idToken,
                                               data=friend_patch_data)
 
