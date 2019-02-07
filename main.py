@@ -1,16 +1,15 @@
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.uix.screenmanager import Screen, NoTransition, CardTransition
-from kivy.uix.button import ButtonBehavior
-from kivy.uix.image import Image
+from specialbuttons import ImageButton, LabelButton
 from workoutbanner import WorkoutBanner
-from kivy.uix.label import Label
 from functools import partial
 from os import walk
 from myfirebase import MyFirebase
+from friendbanner import FriendBanner
 import requests
 import json
-
+import traceback
 
 class HomeScreen(Screen):
     pass
@@ -21,11 +20,11 @@ class AddFriendScreen(Screen):
 class AddWorkoutScreen(Screen):
     pass
 
-class LabelButton(ButtonBehavior, Label):
+
+
+class FriendsListScreen(Screen):
     pass
 
-class ImageButton(ButtonBehavior, Image):
-    pass
 
 class LoginScreen(Screen):
     pass
@@ -91,6 +90,15 @@ class MainApp(App):
             # Get friends list
             self.friends_list = data['friends']
 
+            # Populate friends list grid
+            friends_list_array = self.friends_list.split(",")
+            print(friends_list_array)
+            for friend in friends_list_array:
+                friend = friend.replace(" ", "")
+                friend_banner = FriendBanner(friend_id = friend)
+                self.root.ids['friends_list_screen'].ids['friends_list_grid'].add_widget(friend_banner)
+
+
             # Get and update streak label
             streak_label = self.root.ids['home_screen'].ids['streak_label']
             streak_label.text = str(data['streak']) + " Day Streak!"
@@ -100,24 +108,23 @@ class MainApp(App):
             friend_id_label.text = "Friend ID: " + str(self.my_friend_id)
 
             banner_grid = self.root.ids['home_screen'].ids['banner_grid']
-            print("----")
-            print(data['workouts'])
             workouts = data['workouts']
-            workout_keys = workouts.keys()
-            for workout_key in workout_keys:
-                workout = workouts[workout_key]
-                # Populate workout grid in home screen
-                W = WorkoutBanner(workout_image=workout['workout_image'], description=workout['description'],
-                                  type_image=workout['type_image'], number=workout['number'], units=workout['units'],
-                                  likes=workout['likes'])
-                banner_grid.add_widget(W)
+            if workouts != "":
+                workout_keys = workouts.keys()
+                for workout_key in workout_keys:
+                    workout = workouts[workout_key]
+                    # Populate workout grid in home screen
+                    W = WorkoutBanner(workout_image=workout['workout_image'], description=workout['description'],
+                                      type_image=workout['type_image'], number=workout['number'], units=workout['units'],
+                                      likes=workout['likes'])
+                    banner_grid.add_widget(W)
 
             self.root.ids['screen_manager'].transition = NoTransition()
             self.change_screen("home_screen")
             self.root.ids['screen_manager'].transition = CardTransition()
 
         except Exception as e:
-            print(e)
+            traceback.print_exc()
             pass
 
     def add_friend(self, friend_id):
