@@ -6,7 +6,6 @@ from kivy.graphics import Color, Rectangle
 import kivy.utils
 
 class WorkoutBanner(GridLayout):
-
     def __init__(self, **kwargs):
         self.rows = 1
         super(WorkoutBanner, self).__init__(**kwargs)

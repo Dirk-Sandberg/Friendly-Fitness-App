@@ -1,3 +1,5 @@
+import sys
+sys.path.append("/".join(x for x in __file__.split("/")[:-1]))
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.uix.screenmanager import Screen, NoTransition, CardTransition
@@ -20,7 +22,8 @@ class AddFriendScreen(Screen):
 class AddWorkoutScreen(Screen):
     pass
 
-
+class FriendWorkoutScreen(Screen):
+    pass
 
 class FriendsListScreen(Screen):
     pass
@@ -219,6 +222,43 @@ class MainApp(App):
                                         %(self.local_id, self.id_token), data=json.dumps(workout_payload))
         print(workout_request.json())
 
+
+    def load_friend_workout_screen(self, friend_id, widget):
+        # Get their workouts by using their friend id to query the database
+        friend_data_req = requests.get('https://friendly-fitness.firebaseio.com/.json?orderBy="my_friend_id"&equalTo=' + friend_id)
+        #print("Hey", friend_data_req.json())
+        friend_data = friend_data_req.json()
+        workouts = friend_data.values()[0]['workouts']
+
+        friend_banner_grid = self.root.ids['friend_workout_screen'].ids['friend_banner_grid']
+
+        # Remove each widget in the friend_banner_grid
+        for w in friend_banner_grid.walk():
+            if w.__class__ == WorkoutBanner:
+                friend_banner_grid.remove_widget(w)
+
+        # Populate the friend_workout_screen
+        # Loop through each key in the workouts dictionary
+        #    for the value for that key, create a workout banner
+        #    add the workout banner to the scrollview
+        if workouts == {} or workouts == "":
+            # Change to the friend_workout_screen
+            self.change_screen("friend_workout_screen")
+            return
+        for key in workouts.keys():
+            workout = workouts[key]
+            print(key, workout)
+            W = WorkoutBanner(workout_image=workout['workout_image'], description=workout['description'],
+                              type_image=workout['type_image'], number=workout['number'], units=workout['units'],
+                              likes=workout['likes'])
+            friend_banner_grid.add_widget(W)
+
+        # Populate the streak label
+        friend_streak_label = self.root.ids['friend_workout_screen'].ids['friend_streak_label']
+        friend_streak_label.text = str(friend_data.values()[0]['streak'])
+
+        # Change to the friend_workout_screen
+        self.change_screen("friend_workout_screen")
 
     def change_screen(self, screen_name):
         # Get the screen manager from the kv file
