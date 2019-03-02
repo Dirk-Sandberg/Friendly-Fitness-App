@@ -13,7 +13,7 @@ class FriendBanner(FloatLayout):
     def __init__(self, **kwargs):
         super(FriendBanner, self).__init__(**kwargs)
         with self.canvas.before:
-            Color(rgb=(kivy.utils.get_color_from_hex("#67697C")))
+            Color(rgba=(kivy.utils.get_color_from_hex("#6C5B7B"))[:3] + [.5])
             self.rect = Rectangle(size=self.size, pos=self.pos)
         self.bind(pos=self.update_rect, size=self.update_rect)
 

@@ -13,7 +13,7 @@ GridLayout:
         GridLayout:
             canvas:
                 Color:
-                    rgb: utils.get_color_from_hex("#39B3F2")
+                    rgb: utils.get_color_from_hex("#35477d")
                 Rectangle:
                     size: self.size
                     pos: self.pos
@@ -22,13 +22,17 @@ GridLayout:
             pos_hint: {"top": 1, "left": 1}
             size_hint: 1, .05
             Image:
+                id: time_indicator2
                 source: "icons/001-sun.png"
+                opacity: 0
             Image:
+                id: time_indicator3
                 source: "icons/003-sunset.png"
+                opacity: 0
         FloatLayout:
             canvas:
                 Color:
-                    rgb: utils.get_color_from_hex("#39B3F2")
+                    rgb: utils.get_color_from_hex("#35477d")
                 Rectangle:
                     size: self.size
                     pos: self.pos
@@ -37,18 +41,22 @@ GridLayout:
             pos_hint: {"top": .95, "left": 1}
             size_hint: 1, .15
             Image:
+                id: time_indicator1
                 source: "icons/002-sunrise.png"
                 size_hint: 0.25, 0.5
                 pos_hint: {"top": 1, "right": 0.25}
+                opacity: 0
             Image:
                 source: "icons/avatars/man.png"
                 id: avatar_image
                 size_hint: 0.5, 1
-                pos_hint: {"top": 1, "right": 0.75}
+                pos_hint: {"top": 1.15, "right": 0.75}
             Image:
+                id: time_indicator4
                 source: "icons/007-crescent-moon.png"
                 size_hint: 0.25, 0.5
                 pos_hint: {"top": 1, "right": 1}
+                opacity: 0
         ScreenManager:
             size_hint: 1, 0.799
             pos_hint: {"top": .799, "left": 1}

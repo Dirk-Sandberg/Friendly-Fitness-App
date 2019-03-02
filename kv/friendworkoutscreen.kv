@@ -5,7 +5,7 @@
     FloatLayout:
         canvas:
             Color:
-                rgb: utils.get_color_from_hex("#39B3F2")
+                rgb: utils.get_color_from_hex("#35477d")
             Rectangle:
                 size: self.size
                 pos: self.pos
@@ -34,5 +34,5 @@
             size_hint: 1, .15
             source: "icons/back.png"
             on_release:
-                app.change_screen("friends_list_screen")
+                app.change_screen("friends_list_screen", direction = 'backwards')
 

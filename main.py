@@ -3,15 +3,19 @@ sys.path.append("/".join(x for x in __file__.split("/")[:-1]))
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.uix.screenmanager import Screen, NoTransition, CardTransition
-from specialbuttons import ImageButton, LabelButton
+from specialbuttons import ImageButton, LabelButton, ImageButtonSelectable
 from workoutbanner import WorkoutBanner
 from functools import partial
 from os import walk
 from myfirebase import MyFirebase
+from datetime import datetime
 from friendbanner import FriendBanner
+import kivy.utils
 import requests
 import json
 import traceback
+from kivy.graphics import Color, RoundedRectangle
+
 
 class HomeScreen(Screen):
     pass
@@ -42,9 +46,12 @@ class ChangeAvatarScreen(Screen):
 
 GUI = Builder.load_file("main.kv")  # Make sure this is after all class definitions!
 class MainApp(App):
-    my_friend_id = 1
+    my_friend_id = ""
     workout_image = None
     option_choice = None
+    workout_image_widget = ""
+    previous_workout_image_widget = None
+    friends_list = ""
 
 
     def build(self):
@@ -52,14 +59,43 @@ class MainApp(App):
         return GUI
 
     def update_workout_image(self, filename, widget_id):
+        self.previous_workout_image_widget = self.workout_image_widget
         self.workout_image = filename
+        self.workout_image_widget = widget_id
+        # Clear the indication that the previous image was selected
+        if self.previous_workout_image_widget:
+            self.previous_workout_image_widget.canvas.before.clear()
+
+        # Indicate which image has been selected
+        with self.workout_image_widget.canvas.before:
+            Color(rgb=(kivy.utils.get_color_from_hex("#6C5B7B")))
+            RoundedRectangle(size=self.workout_image_widget.size, pos=self.workout_image_widget.pos, radius = [5,])
+
 
     def on_start(self):
+        # Choose the correct time icon to show based on the current hour of day
+        now = datetime.now()
+        hour = now.hour
+        if hour <= 6:
+            self.root.ids['time_indicator1'].opacity = 1
+        elif hour <= 12:
+            self.root.ids['time_indicator2'].opacity = 1
+        elif hour <= 18:
+            self.root.ids['time_indicator3'].opacity = 1
+        else:
+            self.root.ids['time_indicator4'].opacity = 1
+
+        # Set the current day, month, and year in the add workout section
+        day, month, year = now.day, now.month, now.year
+        self.root.ids.add_workout_screen.ids.month_input.text = str(month)
+        self.root.ids.add_workout_screen.ids.day_input.text = str(day)
+        self.root.ids.add_workout_screen.ids.year_input.text = str(year)
+
         # Populate avatar grid
         avatar_grid = self.root.ids['change_avatar_screen'].ids['avatar_grid']
         for root_dir, folders, files in walk("icons/avatars"):
             for f in files:
-                img = ImageButton(source="icons/avatars/" + f, on_release=partial(self.change_avatar, f))
+                img = ImageButtonSelectable(source="icons/avatars/" + f, on_release=partial(self.change_avatar, f))
                 avatar_grid.add_widget(img)
 
         # Populate workout image grid
@@ -72,7 +108,7 @@ class MainApp(App):
 
 
         try:
-            # Try to read the persisten signin credentials (refresh token)
+            # Try to read the persistent signin credentials (refresh token)
             with open("refresh_token.txt", 'r') as f:
                 refresh_token = f.read()
             # Use refresh token to get a new idToken
@@ -82,9 +118,10 @@ class MainApp(App):
 
             # Get database data
             result = requests.get("https://friendly-fitness.firebaseio.com/" + local_id + ".json?auth=" + id_token)
-            print("res ok?", result.ok)
-            print(result.json())
             data = json.loads(result.content.decode())
+            self.my_friend_id = data['my_friend_id']
+            friend_id_label = self.root.ids['settings_screen'].ids['friend_id_label']
+            friend_id_label.text = "Friend ID: " + str(self.my_friend_id)
 
             # Get and update avatar image
             avatar_image = self.root.ids['avatar_image']
@@ -106,31 +143,57 @@ class MainApp(App):
             streak_label = self.root.ids['home_screen'].ids['streak_label']
             streak_label.text = str(data['streak']) + " Day Streak!"
 
-            # Get and update friend id label
-            friend_id_label = self.root.ids['settings_screen'].ids['friend_id_label']
-            friend_id_label.text = "Friend ID: " + str(self.my_friend_id)
+            # Get and update friend id label -- called automatically by self.set_friend_id
 
+            # Set the images in the add_workout_screen
             banner_grid = self.root.ids['home_screen'].ids['banner_grid']
             workouts = data['workouts']
             if workouts != "":
                 workout_keys = workouts.keys()
+                # Sort workouts by date then reverse (we want youngest dates at the start)
+                workout_keys.sort(key = lambda value : datetime.strptime(workouts[value.encode()]['date'].encode('utf-8'), "%m/%d/%Y"))
+                workout_keys = workout_keys[::-1]
                 for workout_key in workout_keys:
                     workout = workouts[workout_key]
+                    print(workout['date'])
                     # Populate workout grid in home screen
                     W = WorkoutBanner(workout_image=workout['workout_image'], description=workout['description'],
                                       type_image=workout['type_image'], number=workout['number'], units=workout['units'],
-                                      likes=workout['likes'])
+                                      likes=workout['likes'], date=workout['date'])
                     banner_grid.add_widget(W)
 
-            self.root.ids['screen_manager'].transition = NoTransition()
-            self.change_screen("home_screen")
-            self.root.ids['screen_manager'].transition = CardTransition()
+            self.change_screen("home_screen", "None")
 
         except Exception as e:
             traceback.print_exc()
             pass
 
+    def set_friend_id(self, my_friend_id):
+        self.my_friend_id = my_friend_id
+        friend_id_label = self.root.ids['settings_screen'].ids['friend_id_label']
+        friend_id_label.text = "Friend ID: " + str(self.my_friend_id)
+
+
     def add_friend(self, friend_id):
+        friend_id = friend_id.replace("\n","")
+        # Make sure friend id was a number otherwise it's invalid
+        try:
+            int_friend_id = int(friend_id)
+        except:
+            # Friend id had some letters in it when it should just be a number
+            self.root.ids['add_friend_screen'].ids['add_friend_label'].text = "Friend ID should be a number."
+            return
+        # Make sure they aren't adding themselves
+        if friend_id == self.my_friend_id:
+            self.root.ids['add_friend_screen'].ids['add_friend_label'].text = "You can't add yourself as a friend."
+            return
+
+        # Make sure this is not someone already in their friends list
+        if friend_id in self.friends_list.split(","):
+            self.root.ids['add_friend_screen'].ids['add_friend_label'].text = "This user is already in your friend's list."
+            return
+
+
         # Query database and make sure friend_id exists
         check_req = requests.get('https://friendly-fitness.firebaseio.com/.json?orderBy="my_friend_id"&equalTo=' + friend_id)
         data = check_req.json()
@@ -139,20 +202,20 @@ class MainApp(App):
             # If it doesn't, display it doesn't in the message on the add friend screen
             self.root.ids['add_friend_screen'].ids['add_friend_label'].text = "Invalid friend ID"
         else:
+            # Requested friend ID exists
             key = data.keys()[0]
-            new_friend_id = data[key]['my_friend_id']
+            #new_friend_id = data[key]['my_friend_id']
             self.root.ids['add_friend_screen'].ids['add_friend_label'].text = "Friend ID %s added successfully."%friend_id
+
             # Add friend id to friends list and patch new friends list
-            self.friends_list += ", %s"  % friend_id
+            self.friends_list += ",%s"  % friend_id
             patch_data = '{"friends": "%s"}' %self.friends_list
             patch_req = requests.patch("https://friendly-fitness.firebaseio.com/%s.json?auth=%s" % (self.local_id, self.id_token),
                                        data=patch_data)
-            print(patch_req.ok)
-            print(patch_req.json())
 
-
-        # If it does, display "success"
-        # If it does, add to friends list
+            # Add new friend banner in friends list screen
+            friend_banner = FriendBanner(friend_id=friend_id)
+            self.root.ids['friends_list_screen'].ids['friends_list_grid'].add_widget(friend_banner)
 
     def change_avatar(self, image, widget_id):
         # Change avatar in the app
@@ -162,23 +225,25 @@ class MainApp(App):
 
         # Change avatar in firebase database
         my_data = '{"avatar": "%s"}' % image
-        requests.patch("https://friendly-fitness.firebaseio.com/" + str(self.my_friend_id) + ".json",
-                       data=my_data)
+        print("ID TOKEN IS ", self.id_token)
+        requests.patch(
+            "https://friendly-fitness.firebaseio.com/%s.json?auth=%s" % (self.local_id, self.id_token),
+            data=my_data)
 
-        self.change_screen("settings_screen")
+        self.change_screen("settings_screen", direction='left', mode='pop')
 
     def add_workout(self):
         # Get data from all fields in add workout screen
         workout_ids = self.root.ids['add_workout_screen'].ids
 
         # Already have workout image in self.workout_image variable
-        description_input = workout_ids['description_input'].text
+        description_input = workout_ids['description_input'].text.replace("\n","")
         # Already have option choice in self.option_choice
-        quantity_input = workout_ids['quantity_input'].text
-        units_input = workout_ids['units_input'].text
-        month_input = workout_ids['month_input'].text
-        day_input = workout_ids['day_input'].text
-        year_input = workout_ids['year_input'].text
+        quantity_input = workout_ids['quantity_input'].text.replace("\n","")
+        units_input = workout_ids['units_input'].text.replace("\n","")
+        month_input = workout_ids['month_input'].text.replace("\n","")
+        day_input = workout_ids['day_input'].text.replace("\n","")
+        year_input = workout_ids['year_input'].text.replace("\n","")
 
         # Make sure fields aren't garbage
         if self.workout_image == None:
@@ -200,15 +265,23 @@ class MainApp(App):
             return
         try:
             int_month = int(month_input)
+            if int_month > 12:
+                workout_ids['month_input'].background_color = (1, 0, 0, 1)
+                return
         except:
             workout_ids['month_input'].background_color = (1,0,0,1)
             return
         try:
             int_day = int(day_input)
+            if int_day > 31:
+                workout_ids['day_input'].background_color = (1, 0, 0, 1)
+                return
         except:
             workout_ids['day_input'].background_color = (1,0,0,1)
             return
         try:
+            if len(year_input) == 2:
+                year_input = '20'+year_input
             int_year = int(year_input)
         except:
             workout_ids['year_input'].background_color = (1,0,0,1)
@@ -217,9 +290,16 @@ class MainApp(App):
         # If all data is ok, send the data to firebase real-time database
         workout_payload = {"workout_image": self.workout_image, "description": description_input, "likes": 0,
                            "number": float(quantity_input), "type_image": self.option_choice, "units": units_input,
-                           "date": month_input + "/" + day_input + "/20" + year_input}
+                           "date": month_input + "/" + day_input + "/" + year_input}
         workout_request = requests.post("https://friendly-fitness.firebaseio.com/%s/workouts.json?auth=%s"
                                         %(self.local_id, self.id_token), data=json.dumps(workout_payload))
+        # Add the workout to the banner grid in the home screen
+        banner_grid = self.root.ids['home_screen'].ids['banner_grid']
+        W = WorkoutBanner(workout_image=self.workout_image, description=description_input,
+                          type_image=self.option_choice, number=float(quantity_input), units=units_input,
+                          likes="0", date=month_input + "/" + day_input + "/" + year_input)
+        banner_grid.add_widget(W, index=len(banner_grid.children))
+
         print(workout_request.json())
 
 
@@ -241,6 +321,7 @@ class MainApp(App):
         # Loop through each key in the workouts dictionary
         #    for the value for that key, create a workout banner
         #    add the workout banner to the scrollview
+        print("WORKOUTS IS ", workouts, type(workouts))
         if workouts == {} or workouts == "":
             # Change to the friend_workout_screen
             self.change_screen("friend_workout_screen")
@@ -260,9 +341,25 @@ class MainApp(App):
         # Change to the friend_workout_screen
         self.change_screen("friend_workout_screen")
 
-    def change_screen(self, screen_name):
+    def change_screen(self, screen_name, direction='forward', mode = ""):
         # Get the screen manager from the kv file
         screen_manager = self.root.ids['screen_manager']
+        print(direction, mode)
+        # If going backward, change the transition. Else make it the default
+        # Forward/backward between pages made more sense to me than left/right
+        if direction == 'forward':
+            mode = "push"
+            direction = 'left'
+        elif direction == 'backwards':
+            direction = 'right'
+            mode = 'pop'
+        elif direction == "None":
+            screen_manager.transition = NoTransition()
+            screen_manager.current = screen_name
+            return
+
+        screen_manager.transition = CardTransition(direction=direction, mode=mode)
+
         screen_manager.current = screen_name
 
 MainApp().run()

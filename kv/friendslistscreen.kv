@@ -1,13 +1,19 @@
 <FriendsListScreen>:
     canvas:
         Color:
-            rgb: utils.get_color_from_hex("#39B3F2")
+            rgb: utils.get_color_from_hex("#35477d")
         Rectangle:
             size: self.size
             pos: self.pos
     FloatLayout:
+        canvas:
+            Color:
+                rgb: utils.get_color_from_hex("#35477d")
+            Rectangle:
+                size: self.size
+                pos: self.pos
         ScrollView:
-            size_hint: 1, 0.85
+            size_hint: 1, 0.9
             pos_hint: {"top": 1, "left": 1}
             GridLayout:
                 cols: 1
@@ -16,12 +22,19 @@
                 height: self.minimum_height
                 row_default_height: '100dp'
                 row_force_default: True
-                spacing: 2, 2 
-                padding: 2, 2
-        ImageButton:
-            size_hint: .3, 0.15
-            pos_hint: {"top": .15, "left": 1}
-            source: "icons/back.png"
+                spacing: 5,5
+                padding: 5,0
+        LabelButton:
+            text: "[u]Back[/u]"
+            canvas.before:
+                Color:
+                    rgb: utils.get_color_from_hex("#35477d") if self.state == 'normal' else utils.get_color_from_hex("#6C5B7B")
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
+            size_hint: 1, .1
+            pos_hint: {"top": .1, "right": 1}
+            markup: True
             on_release:
-                app.change_screen("home_screen")
+                app.change_screen("home_screen", direction = 'down', mode='pop')
 
