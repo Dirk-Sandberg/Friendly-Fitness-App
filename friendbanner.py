@@ -40,16 +40,17 @@ class FriendBanner(FloatLayout):
                                    on_release=partial(App.get_running_app().load_friend_workout_screen, kwargs['friend_id']))
 
         # Add the friend's ID
-        friend_label = LabelButton(text="[u]Friend ID: " + kwargs['friend_id'] + "[/u]", markup=True,size_hint=(.5, 1),
+        self.friend_label = LabelButton(text=kwargs['friend_id_text'], markup=True,size_hint=(.5, 1),
                                    pos_hint={"top": 1, "right": 1},
                                    on_release=partial(App.get_running_app().load_friend_workout_screen,
                                                       kwargs['friend_id']))
         self.add_widget(self.remove_label)
         self.add_widget(image_button)
-        self.add_widget(friend_label)
+        self.add_widget(self.friend_label)
 
 
-
+    def update_friend_label_text(self, new_friend_id_text):
+        self.friend_label.text = new_friend_id_text
 
     def update_rect(self, *args):
         self.rect.pos = self.pos

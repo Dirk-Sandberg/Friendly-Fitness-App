@@ -54,11 +54,36 @@ class MainApp(App):
     previous_workout_image_widget = None
     friends_list = ""
     refresh_token_file = "refresh_token.txt"
+    nicknames = {}  # Dictionary of nicknames for each friend id in friends list
+    their_friend_id = ""  # Make it so we know which friend's workout screen has been loaded for app.set_friend_nickname
 
 
     def build(self):
         self.my_firebase = MyFirebase()
         return GUI
+
+    def set_friend_nickname(self, nickname, *args):
+        # Make sure they entered something
+        if nickname == "":
+            return
+        # Set the nickname
+        self.nicknames[self.their_friend_id] = nickname
+
+        # Update firebase
+        workout_request = requests.patch("https://friendly-fitness.firebaseio.com/%s/nicknames.json?auth=%s"
+                                        %(self.local_id, self.id_token), data=json.dumps(self.nicknames))
+
+        # Update the nickname in the friend_workout_screen
+        their_friend_id_label = self.root.ids.friend_workout_screen.ids.friend_workout_screen_friend_id
+        their_friend_id_label.text = "[u]" + nickname + "[/u]"
+
+        # Update the nickname in the friend workout banner
+        # Go through each widget in the friends list grid
+        for w in self.root.ids['friends_list_screen'].ids['friends_list_grid'].walk():
+            if w.__class__ == FriendBanner:
+                if w.friend_id == self.their_friend_id:
+                    w.update_friend_label_text(their_friend_id_label.text)
+
 
     def update_workout_image(self, filename, widget_id):
         self.previous_workout_image_widget = self.workout_image_widget
@@ -135,13 +160,20 @@ class MainApp(App):
             # Get friends list
             self.friends_list = data['friends']
 
+            # Get nicknames
+            self.nicknames = data['nicknames']
+
             # Populate friends list grid
             friends_list_array = self.friends_list.split(",")
-            for friend in friends_list_array:
-                friend = friend.replace(" ", "")
-                if friend == "":
+            for friend_id in friends_list_array:
+                friend_id = friend_id.replace(" ", "")
+                if friend_id == "":
                     continue
-                friend_banner = FriendBanner(friend_id = friend)
+                if friend_id in self.nicknames.keys():
+                    friend_id_text = "[u]" + self.nicknames[friend_id] + "[/u]"
+                else:
+                    friend_id_text = "[u]Friend ID: " + friend_id + "[/u]"
+                friend_banner = FriendBanner(friend_id=friend_id, friend_id_text=friend_id_text)
                 self.root.ids['friends_list_screen'].ids['friends_list_grid'].add_widget(friend_banner)
 
 
@@ -219,7 +251,11 @@ class MainApp(App):
                                        data=patch_data)
 
             # Add new friend banner in friends list screen
-            friend_banner = FriendBanner(friend_id=friend_id)
+            if friend_id in self.nicknames.keys():
+                friend_id_text = "[u]" + self.nicknames[friend_id] + "[/u]"
+            else:
+                friend_id_text = "[u]Friend ID: " + friend_id + "[/u]"
+            friend_banner = FriendBanner(friend_id=friend_id, friend_id_text=friend_id_text)
             self.root.ids['friends_list_screen'].ids['friends_list_grid'].add_widget(friend_banner)
             # Inform them they added a friend successfully
             self.root.ids['add_friend_screen'].ids['add_friend_label'].text = "Friend ID %s added successfully."%friend_id
@@ -371,6 +407,9 @@ class MainApp(App):
         # Reload the friends list screen
 
     def load_friend_workout_screen(self, friend_id, widget):
+        # Make it so we know which friend's workout screen has been loaded for app.set_friend_nickname
+        self.their_friend_id = friend_id
+
         # Get their workouts by using their friend id to query the database
         friend_data_req = requests.get('https://friendly-fitness.firebaseio.com/.json?orderBy="my_friend_id"&equalTo=' + friend_id)
 
@@ -391,7 +430,10 @@ class MainApp(App):
         # Populate their friend ID and nickname
         print("Need to populate nickname")
         their_friend_id_label = self.root.ids.friend_workout_screen.ids.friend_workout_screen_friend_id
-        their_friend_id_label.text = "Friend ID: " + friend_id
+        if friend_id in self.nicknames.keys():
+            their_friend_id_label.text = "[u]" + self.nicknames[friend_id] + "[/u]"
+        else:
+            their_friend_id_label.text = "[u]Nickname[/u]"
 
         # Populate the friend_workout_screen
         # Loop through each key in the workouts dictionary
