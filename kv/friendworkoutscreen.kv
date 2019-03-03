@@ -1,28 +1,6 @@
 #:import utils kivy.utils
 #:import F kivy.factory.Factory
-
-<NicknamePopup@ModalView>:
-    # ... do your stuff
-    size_hint: .8, .3
-    pos_hint: {"top": .65, "right": .9}
-    FloatLayout:
-        Label:
-            text: "Set Nickname"
-            size_hint: .8, .2
-            pos_hint: {"top": .9, "right": .9}
-        TextInput:
-            hint_text: "Nickname"
-            size_hint: .8, .2
-            pos_hint: {"top": .6, "right": .9}
-            id: nickname_field
-        LabelButton:
-            size_hint: .8, .2
-            pos_hint: {"top": .3, "right": .9}
-            text: "[u]Okay[/u]"
-            markup: True
-            on_release:
-                app.set_friend_nickname(nickname_field.text)
-                root.dismiss()
+#:include kv/nicknamepopup.kv
 
 <FriendWorkoutScreen>:
     FloatLayout:

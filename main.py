@@ -161,7 +161,10 @@ class MainApp(App):
             self.friends_list = data['friends']
 
             # Get nicknames
-            self.nicknames = data['nicknames']
+            try:
+                self.nicknames = data['nicknames']
+            except:
+                self.nicknames = {}
 
             # Populate friends list grid
             friends_list_array = self.friends_list.split(",")
@@ -450,7 +453,7 @@ class MainApp(App):
             workout = workouts[workout_key]
             W = WorkoutBanner(workout_image=workout['workout_image'], description=workout['description'],
                               type_image=workout['type_image'], number=workout['number'], units=workout['units'],
-                              likes=workout['likes'],date=workout['date'])
+                              likes=workout['likes'],date=workout['date'], likeable=True, workout_key=workout_key)
             friend_banner_grid.add_widget(W)
 
         # Populate the streak label
