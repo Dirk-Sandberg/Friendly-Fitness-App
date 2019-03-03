@@ -13,10 +13,7 @@ class MyFirebase():
         signup_url = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=" + self.wak
         signup_payload = {"email": email, "password": password, "returnSecureToken": True}
         sign_up_request = requests.post(signup_url, data=signup_payload)
-        print(sign_up_request.ok)
-        print(sign_up_request.content.decode())
         sign_up_data = json.loads(sign_up_request.content.decode())
-        print(sign_up_data)
         if sign_up_request.ok == True:
             refresh_token = sign_up_data['refreshToken']
             localId = sign_up_data['localId']
@@ -30,16 +27,52 @@ class MyFirebase():
             app.local_id = localId
             app.id_token = idToken
 
-
             # Create new key in database from localId
             # Get friend ID
             # Get request on firebase to get the next friend id
             self.friend_get_req = UrlRequest("https://friendly-fitness.firebaseio.com/next_friend_id.json?auth=" + idToken, on_success=self.on_friend_get_req_ok)
 
-        if sign_up_request.ok == False:
+        elif sign_up_request.ok == False:
             error_data = json.loads(sign_up_request.content.decode())
             error_message = error_data["error"]['message']
-            app.root.ids['login_screen'].ids['login_message'].text = error_message.replace("_", " ")
+            if error_message == "EMAIL_EXISTS":
+                self.sign_in_existing_user(email, password)
+            else:
+                app.root.ids['login_screen'].ids['login_message'].text = error_message.replace("_", " ")
+
+    def sign_in_existing_user(self, email, password):
+        """Called if a user tried to sign up and their email already existed."""
+        signin_url = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=" + self.wak
+        signin_payload = {"email": email, "password": password, "returnSecureToken": True}
+        signin_request = requests.post(signin_url, data=signin_payload)
+        sign_up_data = json.loads(signin_request.content.decode())
+        app = App.get_running_app()
+
+        if signin_request.ok == True:
+            refresh_token = sign_up_data['refreshToken']
+            localId = sign_up_data['localId']
+            idToken = sign_up_data['idToken']
+            # Save refreshToken to a file
+            with open("refresh_token.txt", "w") as f:
+                f.write(refresh_token)
+
+            # Save localId to a variable in main app class
+            # Save idToken to a variable in main app class
+            app.local_id = localId
+            app.id_token = idToken
+
+            # Create new key in database from localId
+            # Get friend ID
+            # Get request on firebase to get the next friend id
+            # --- User exists so i dont need to get a friend id
+            #self.friend_get_req = UrlRequest("https://friendly-fitness.firebaseio.com/next_friend_id.json?auth=" + idToken, on_success=self.on_friend_get_req_ok)
+            #app.change_screen("home_screen")
+            app.on_start()
+        elif signin_request.ok == False:
+            error_data = json.loads(signin_request.content.decode())
+            error_message = error_data["error"]['message']
+            app.root.ids['login_screen'].ids['login_message'].text = "EMAIL EXISTS - " + error_message.replace("_", " ")
+
 
     def on_friend_get_req_ok(self, *args):
         app = App.get_running_app()
@@ -67,8 +100,6 @@ class MyFirebase():
         refresh_url = "https://securetoken.googleapis.com/v1/token?key=" + self.wak
         refresh_payload = '{"grant_type": "refresh_token", "refresh_token": "%s"}' % refresh_token
         refresh_req = requests.post(refresh_url, data=refresh_payload)
-        print("REFRESH OK?", refresh_req.ok)
-        print(refresh_req.json())
         id_token = refresh_req.json()['id_token']
         local_id = refresh_req.json()['user_id']
         return id_token, local_id

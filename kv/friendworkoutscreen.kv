@@ -9,15 +9,25 @@
             Rectangle:
                 size: self.size
                 pos: self.pos
-        Label:
-            # Streak label
+        GridLayout:
+            rows: 1
+            padding: 0, 5
             pos_hint: {"top": 1, "left": 1}
-            size_hint: 1, .1
-            text: ""
-            id: friend_streak_label
+            size_hint: 1, .15
+            Image:
+                # Avatar image for your friend
+                id: friend_workout_screen_image
+            Label:
+                # Label for their friend ID
+                id: friend_workout_screen_friend_id
+
+            Label:
+                # Streak label
+                text: ""
+                id: friend_streak_label
         ScrollView:
-            pos_hint: {"top": .9, "left": 1}
-            size_hint: 1, .75
+            pos_hint: {"top": .85, "left": 1}
+            size_hint: 1, .65
             GridLayout:
                 # Banner grid
                 id: friend_banner_grid
@@ -29,10 +39,17 @@
                 row_force_default: True
 
 
-        ImageButton:
-            pos_hint: {"top": .15, "left": 1}
-            size_hint: 1, .15
-            source: "icons/back.png"
+        LabelButton:
+            text: "[u]Back[/u]"
+            canvas.before:
+                Color:
+                    rgb: utils.get_color_from_hex("#35477d") if self.state == 'normal' else utils.get_color_from_hex("#6C5B7B")
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
+            size_hint: 1, .1
+            pos_hint: {"top": .1, "right": 1}
+            markup: True
             on_release:
-                app.change_screen("friends_list_screen", direction = 'backwards')
+                app.change_screen("friends_list_screen", direction='right', mode='pop')
 

@@ -14,6 +14,7 @@
                 pos: self.pos
         Label:
             text: "Select Workout Image"
+            id: select_workout_image_label
             size_hint: 1, .05
             pos_hint: {"top": 1, "right": 1}
         ScrollView:
@@ -39,7 +40,7 @@
             pos_hint: {"top": .75, "right": .9}
             id: description_input
             on_text:
-                self.focus = False if "\n" in self.text else True
+                self.focus = not self.focus if "\n" in self.text else self.focus
         GridLayout:
             rows: 1
             size_hint: 1, .15
@@ -88,6 +89,7 @@
             id: quantity_input
             on_text:
                 self.background_color = (1,1,1,1)
+                self.focus = not self.focus if "\n" in self.text else self.focus
         TextInput:
             size_hint: .3, .1
             pos_hint: {"top": .35, "right": .9}
@@ -95,6 +97,7 @@
             id: units_input
             on_text:
                 self.background_color = (1,1,1,1)
+                self.focus = not self.focus if "\n" in self.text else self.focus
         TextInput:
             size_hint: .2, .1
             pos_hint: {"top": .2, "right": .3}
@@ -102,6 +105,7 @@
             id: month_input
             on_text:
                 self.background_color = (1,1,1,1)
+                self.focus = not self.focus if "\n" in self.text else self.focus
         TextInput:
             size_hint: .2, .1
             pos_hint: {"top": .2, "right": .6}
@@ -109,6 +113,7 @@
             id: day_input
             on_text:
                 self.background_color = (1,1,1,1)
+                self.focus = not self.focus if "\n" in self.text else self.focus
         TextInput:
             size_hint: .2, .1
             pos_hint: {"top": .2, "right": .9}
@@ -116,6 +121,7 @@
             id: year_input
             on_text:
                 self.background_color = (1,1,1,1)
+                self.focus = not self.focus if "\n" in self.text else self.focus
         LabelButton:
             text: "[u]Add Workout[/u]"
             canvas.before:

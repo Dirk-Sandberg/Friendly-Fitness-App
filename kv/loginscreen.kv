@@ -6,17 +6,28 @@
             size: self.size
             pos: self.pos
     FloatLayout:
+        canvas:
+            Color:
+                rgb: utils.get_color_from_hex("#35477d")
+            Rectangle:
+                size: self.size
+                pos: self.pos
         TextInput:
             id: login_email
             hint_text: "email"
             size_hint: .8, .1
             pos_hint: {"top": .9, "right" :.9}
+            on_text:
+                self.focus = not self.focus if "\n" in self.text else self.focus
+
         TextInput:
             id: login_password
             password: True
             hint_text: "password"
             size_hint: .8, .1
             pos_hint: {"top": .7, "right" :.9}
+            on_text:
+                self.focus = not self.focus if "\n" in self.text else self.focus
         Label:
             id: login_message
             color: (1,0,0,1)
@@ -29,7 +40,7 @@
                 Rectangle:
                     size: self.size
                     pos: self.pos
-            text: "[u]Sign up![/u]"
+            text: "[u]Sign up / Sign in[/u]"
             markup: True
             size_hint: .8, .1
             pos_hint: {"top": .2, "right" :.9}

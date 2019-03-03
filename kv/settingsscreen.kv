@@ -21,7 +21,7 @@
             pos_hint: {"top": 1, "left": 1}
         ImageButton:
             size_hint: .5, .2
-            pos_hint: {"top": .8, "left": 1}
+            pos_hint: {"top": .9, "left": 1}
             source: "icons/avatars/man.png"
             on_release:
                 app.change_screen("change_avatar_screen", direction = 'right', mode = 'push')
@@ -33,14 +33,14 @@
                     size: self.size
                     pos: self.pos
             size_hint: .3, .1
-            pos_hint: {"top": .75, "right": .8}
+            pos_hint: {"top": .85, "right": .8}
             text: "[u]Change Avatar[/u]"
             markup: True
             on_release:
                 app.change_screen("change_avatar_screen", direction = 'right', mode = 'push')
         ImageButton:
             size_hint: .5, .2
-            pos_hint: {"top": .5, "left": 1}
+            pos_hint: {"top": .65, "left": 1}
             source: "icons/007-add-friend.png"
             on_release:
                 app.change_screen("add_friend_screen", direction = 'right', mode='push')
@@ -52,11 +52,34 @@
                     size: self.size
                     pos: self.pos
             size_hint: .3, .1
-            pos_hint: {"top": .45, "right": .8}
+            pos_hint: {"top": .6, "right": .8}
             text: "[u]Add A Friend[/u]"
             markup: True
             on_release:
                 app.change_screen("add_friend_screen", direction = 'right', mode='push')
+
+
+        ImageButton:
+            size_hint: .5, .2
+            pos_hint: {"top": .4, "left": 1}
+            source: "icons/sign_out.png"
+            on_release:
+                app.sign_out_user()
+        LabelButton:
+            canvas.before:
+                Color:
+                    rgb: utils.get_color_from_hex("#35477d") if self.state == 'normal' else utils.get_color_from_hex("#6C5B7B")
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
+            size_hint: .3, .1
+            pos_hint: {"top": .35, "right": .8}
+            text: "[u]Sign Out[/u]"
+            markup: True
+            on_release:
+                app.sign_out_user()
+
+
         LabelButton:
             text: "[u]Back[/u]"
             canvas.before:

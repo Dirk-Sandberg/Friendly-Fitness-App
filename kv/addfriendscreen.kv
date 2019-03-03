@@ -17,6 +17,9 @@
             hint_text: "Type friend id here"
             size_hint: .6, .1
             pos_hint: {"top": .8, "right": .7}
+            on_text:
+                self.focus = not self.focus if "\n" in self.text else self.focus
+
         ImageButton:
             source: "icons/next-1.png"
             size_hint: .2, .1
