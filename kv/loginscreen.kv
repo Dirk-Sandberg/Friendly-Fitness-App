@@ -18,7 +18,8 @@
             size_hint: .8, .1
             pos_hint: {"top": .9, "right" :.9}
             on_text:
-                self.focus = not self.focus if "\n" in self.text else self.focus
+                self.focus = not self.focus if self.text.endswith("\n") else self.focus
+                #self.text = self.text.replace("\n","")
 
         TextInput:
             id: login_password
@@ -27,7 +28,9 @@
             size_hint: .8, .1
             pos_hint: {"top": .7, "right" :.9}
             on_text:
-                self.focus = not self.focus if "\n" in self.text else self.focus
+                self.focus = not self.focus if self.text.endswith("\n") else self.focus
+                #self.text = self.text.replace("\n","")
+
         Label:
             id: login_message
             color: (1,0,0,1)
@@ -45,6 +48,8 @@
             size_hint: .8, .1
             pos_hint: {"top": .2, "right" :.9}
             on_release:
+                #print(app.nicknames)
+                login_message.text = ""
                 app.my_firebase.sign_up(login_email.text, login_password.text)
 
 

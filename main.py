@@ -11,6 +11,7 @@ from myfirebase import MyFirebase
 from datetime import datetime
 from friendbanner import FriendBanner
 import kivy.utils
+from kivy.utils import platform
 import requests
 import json
 import traceback
@@ -45,7 +46,7 @@ class SettingsScreen(Screen):
 class ChangeAvatarScreen(Screen):
     pass
 
-GUI = Builder.load_file("main.kv")  # Make sure this is after all class definitions!
+#GUI =   # Make sure this is after all class definitions!
 class MainApp(App):
     my_friend_id = ""
     workout_image = None
@@ -56,11 +57,16 @@ class MainApp(App):
     refresh_token_file = "refresh_token.txt"
     nicknames = {}  # Dictionary of nicknames for each friend id in friends list
     their_friend_id = ""  # Make it so we know which friend's workout screen has been loaded for app.set_friend_nickname
-
+    my_firebase = None  # Reference to class in myfirebase.py
 
     def build(self):
+        print("BEFORE")
         self.my_firebase = MyFirebase()
-        return GUI
+        print(self.my_firebase)
+        print("AFTER")
+        if platform == 'ios':
+            self.refresh_token_file = App.get_running_app().user_data_dir + self.refresh_token_file
+        return Builder.load_file("main.kv")#GUI
 
     def set_friend_nickname(self, nickname, *args):
         # Make sure they entered something
@@ -271,6 +277,48 @@ class MainApp(App):
         # Need to set the avatar to the default image
         avatar_image = self.root.ids['avatar_image']
         avatar_image.source = "icons/avatars/man.png"
+
+        add_friend_screen = self.root.ids.add_friend_screen
+        add_friend_screen.ids.add_friend_label.text = ""
+        add_friend_screen.ids.add_friend_input.text = ""
+
+        # Clear home screen
+        self.root.ids.home_screen.ids.streak_label.text = "0 Day Streak"
+
+        # Clear login screen
+        self.root.ids.login_screen.ids.login_email.text = ""
+        self.root.ids.login_screen.ids.login_password.text = ""
+
+        # Clear workout screen
+        workout_screen = self.root.ids.add_workout_screen
+        workout_screen.ids.description_input.text = ""
+        workout_screen.ids.time_label.color = (0,0,0,1)
+        workout_screen.ids.distance_label.color = (0,0,0,1)
+        workout_screen.ids.sets_label.color = (0,0,0,1)
+        workout_screen.ids.quantity_input.text = ""
+        workout_screen.ids.quantity_input.background_color = (1,1,1,1)
+        workout_screen.ids.units_input.text = ""
+        workout_screen.ids.units_input.background_color = (1,1,1,1)
+        now = datetime.now()
+        day, month, year = now.day, now.month, now.year
+        workout_screen.ids.month_input.text = str(month)
+        workout_screen.ids.month_input.background_color = (1,1,1,1)
+        workout_screen.ids.day_input.text = str(day)
+        workout_screen.ids.day_input.background_color = (1,1,1,1)
+        workout_screen.ids.year_input.text = str(year)
+        workout_screen.ids.year_input.background_color = (1,1,1,1)
+
+
+        self.workout_image = None
+        self.option_choice = None
+        # Clear the indication that the previous image was selected
+        if self.workout_image_widget:
+            self.workout_image_widget.canvas.before.clear()
+        # Make sure the text color of the label above the scrollview is white (incase it was red from them earlier)
+        select_workout_image_label = workout_screen.ids.select_workout_image_label
+        select_workout_image_label.color = (1, 1, 1, 1)
+
+
 
 
 

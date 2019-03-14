@@ -8,6 +8,8 @@ class MyFirebase():
 
     def sign_up(self, email, password):
         app = App.get_running_app()
+        email = email.replace("\n","")
+        password = email.replace("\n","")
         # Send email and password to Firebase
         # Firebase will return localId, authToken (idToken), refreshToken
         signup_url = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=" + self.wak
@@ -19,7 +21,7 @@ class MyFirebase():
             localId = sign_up_data['localId']
             idToken = sign_up_data['idToken']
             # Save refreshToken to a file
-            with open("refresh_token.txt", "w") as f:
+            with open(app.refresh_token_file, "w") as f:
                 f.write(refresh_token)
 
             # Save localId to a variable in main app class
@@ -53,7 +55,7 @@ class MyFirebase():
             localId = sign_up_data['localId']
             idToken = sign_up_data['idToken']
             # Save refreshToken to a file
-            with open("refresh_token.txt", "w") as f:
+            with open(app.refresh_token_file, "w") as f:
                 f.write(refresh_token)
 
             # Save localId to a variable in main app class

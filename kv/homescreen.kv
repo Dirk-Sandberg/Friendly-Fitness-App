@@ -27,45 +27,47 @@
                 height: self.minimum_height
                 row_default_height: '100dp'
                 row_force_default: True
-        LabelButton:
-            text: "[u]Settings[/u]"
-            canvas.before:
-                Color:
-                    rgb: utils.get_color_from_hex("#35477d") if self.state == 'normal' else utils.get_color_from_hex("#6C5B7B")
-                Rectangle:
-                    size: self.size
-                    pos: self.pos
-            size_hint: .33, .1
-            pos_hint: {"top": .1, "right": .333}
-            markup: True
-            on_release:
-                app.change_screen("settings_screen", direction='right', mode='push')
-        LabelButton:
-            text: "[u]Friends List[/u]"
-            canvas.before:
-                Color:
-                    rgb: utils.get_color_from_hex("#35477d") if self.state == 'normal' else utils.get_color_from_hex("#6C5B7B")
-                Rectangle:
-                    size: self.size
-                    pos: self.pos
-            size_hint: .33, .1
-            pos_hint: {"top": .1, "right": .666}
-            markup: True
-            on_release:
-                app.change_screen("friends_list_screen", direction='up', mode='push')
-        LabelButton:
-            text: "[u]New Workout[/u]"
-            canvas.before:
-                Color:
-                    rgb: utils.get_color_from_hex("#35477d") if self.state == 'normal' else utils.get_color_from_hex("#6C5B7B")
-                Rectangle:
-                    size: self.size
-                    pos: self.pos
-            size_hint: .33, .1
+        GridLayout:
+            rows: 1
+            size_hint: 1, .1
             pos_hint: {"top": .1, "right": 1}
-            markup: True
-            on_release:
-                app.change_screen("add_workout_screen")
+            LabelButton:
+                text: "[u]Settings[/u]"
+                canvas.before:
+                    Color:
+                        rgb: utils.get_color_from_hex("#35477d") if self.state == 'normal' else utils.get_color_from_hex("#6C5B7B")
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+                markup: True
+                on_release:
+                    app.change_screen("settings_screen", direction='right', mode='push')
+            LabelButton:
+                text: "[u]Friends List[/u]"
+                canvas.before:
+                    Color:
+                        rgb: utils.get_color_from_hex("#35477d") if self.state == 'normal' else utils.get_color_from_hex("#6C5B7B")
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+                #size_hint: .33, .1
+                #pos_hint: {"top": .1, "right": .666}
+                markup: True
+                on_release:
+                    app.change_screen("friends_list_screen", direction='up', mode='push')
+            LabelButton:
+                text: "[u]New Workout[/u]"
+                canvas.before:
+                    Color:
+                        rgb: utils.get_color_from_hex("#35477d") if self.state == 'normal' else utils.get_color_from_hex("#6C5B7B")
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+                #size_hint: .33, .1
+                #pos_hint: {"top": .1, "right": 1}
+                markup: True
+                on_release:
+                    app.change_screen("add_workout_screen")
 
 
 
