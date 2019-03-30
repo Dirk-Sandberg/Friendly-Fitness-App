@@ -17,7 +17,7 @@ def count_workout_streak(workouts):
 
 
     # Get the current date so we can compare to the workout dates
-    dtc = datetime.now() # dtc is "Date To Check"
+    dtc = datetime.now()  # dtc is "Date To Check"
     delta = timedelta(days=1)
 
     first_workout_date = workouts[workout_keys[0]]['date']
@@ -26,7 +26,10 @@ def count_workout_streak(workouts):
     # If they have worked out today, add one
     if dtc.day == fwdt.day and dtc.month == fwdt.month and dtc.year == fwdt.year:
         streak += 1
-
+    # If they worked out yesterday, start the streak from yesterday
+    if (dtc - delta).day == fwdt.day and (dtc-delta).month == fwdt.month and (dtc-delta).year == fwdt.year:
+        streak += 1
+        dtc = dtc-delta
     # Loop through 2nd -> last workouts
     # For each workout, add 1 if it was the next day
     pwdt = fwdt # pwdt = "Previous Workout Date Time"
@@ -37,9 +40,9 @@ def count_workout_streak(workouts):
         if wdt.day == pwdt.day and wdt.month == pwdt.month and wdt.year == pwdt.year:
             # They logged two workouts on the same day, don't count the streak and don't move to next day
             continue
-        pwdt = wdt
         dtc = dtc - delta
         if dtc.day == wdt.day and dtc.month == wdt.month and dtc.year == wdt.year:
             streak += 1
+        pwdt = wdt
 
     return str(streak)

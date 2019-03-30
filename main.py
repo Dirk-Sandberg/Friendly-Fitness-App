@@ -197,9 +197,12 @@ class MainApp(App):
             if workouts != "":
                 workout_keys = workouts.keys()
                 streak = helperfunctions.count_workout_streak(workouts)
-                streak_label.text = str(streak) + " Day Streak"
+                if str(streak) == 0:
+                    streak_label.text = "0 Day Streak. Go workout!"
+                else:
+                    streak_label.text = str(streak) + " Day Streak!"
                 # Sort workouts by date then reverse (we want youngest dates at the start)
-                workout_keys.sort(key = lambda value : datetime.strptime(workouts[value.encode()]['date'].encode('utf-8'), "%m/%d/%Y"))
+                workout_keys.sort(key=lambda value : datetime.strptime(workouts[value.encode()]['date'].encode('utf-8'), "%m/%d/%Y"))
                 workout_keys = workout_keys[::-1]
                 for workout_key in workout_keys:
                     workout = workouts[workout_key]
@@ -283,7 +286,7 @@ class MainApp(App):
         add_friend_screen.ids.add_friend_input.text = ""
 
         # Clear home screen
-        self.root.ids.home_screen.ids.streak_label.text = "0 Day Streak"
+        self.root.ids.home_screen.ids.streak_label.text = "0 Day Streak. Go workout!"
 
         # Clear login screen
         self.root.ids.login_screen.ids.login_email.text = ""
@@ -432,7 +435,11 @@ class MainApp(App):
         data = json.loads(result.content.decode())
         workouts = data['workouts']
         streak = helperfunctions.count_workout_streak(workouts)
-        streak_label.text = str(streak) + " Day Streak"
+        if str(streak) == "0":
+            streak_label.text = str(streak) + " Day Streak. Go workout!"
+        else:
+            streak_label.text = str(streak) + " Day Streak!"
+
 
         # Go back to the home screen
         self.change_screen("home_screen", direction="backwards")
@@ -458,6 +465,11 @@ class MainApp(App):
         # Reload the friends list screen
 
     def load_friend_workout_screen(self, friend_id, widget):
+        # Initialize friend streak label to 0
+        friend_streak_label = self.root.ids['friend_workout_screen'].ids['friend_streak_label']
+        friend_streak_label.text = "0 Day Streak"
+
+
         # Make it so we know which friend's workout screen has been loaded for app.set_friend_nickname
         self.their_friend_id = friend_id
 
@@ -505,7 +517,6 @@ class MainApp(App):
             friend_banner_grid.add_widget(W)
 
         # Populate the streak label
-        friend_streak_label = self.root.ids['friend_workout_screen'].ids['friend_streak_label']
         friend_streak_label.text = helperfunctions.count_workout_streak(workouts) + " Day Streak"
 
 
