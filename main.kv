@@ -58,7 +58,7 @@ GridLayout:
                 pos_hint: {"top": 1, "right": 1}
                 opacity: 0
         ScreenManager:
-            size_hint: 1, 0.799
+            size_hint: 1, 0.699
             pos_hint: {"top": .799, "left": 1}
             id: screen_manager
             LoginScreen:
@@ -85,3 +85,12 @@ GridLayout:
             FriendWorkoutScreen:
                 name: "friend_workout_screen"
                 id: friend_workout_screen
+        Widget:
+            size_hint: 1, .1
+            pos_hint: {"top": .1, "right": 1}
+            canvas:
+                Color:
+                    rgb: utils.get_color_from_hex("#35477d")
+                Rectangle:
+                    size: self.size
+                    pos: self.pos

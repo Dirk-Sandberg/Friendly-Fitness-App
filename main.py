@@ -109,6 +109,11 @@ class MainApp(App):
 
 
     def on_start(self):
+        # Display the ads
+        if platform == 'ios':
+            from pyobjus import autoclass
+            self.banner_ad = autoclass('adSwitch').alloc().init()
+
         # Choose the correct time icon to show based on the current hour of day
         now = datetime.now()
         hour = now.hour
@@ -155,6 +160,9 @@ class MainApp(App):
             # Get database data
             result = requests.get("https://friendly-fitness.firebaseio.com/" + local_id + ".json?auth=" + id_token)
             data = json.loads(result.content.decode())
+            print("id token is", id_token)
+            print(result.ok)
+            print("DATA IS", data)
             self.my_friend_id = data['my_friend_id']
             friend_id_label = self.root.ids['settings_screen'].ids['friend_id_label']
             friend_id_label.text = "Friend ID: " + str(self.my_friend_id)
