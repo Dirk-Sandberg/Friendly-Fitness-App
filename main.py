@@ -4,6 +4,7 @@ from kivy.app import App
 from kivy.lang import Builder
 from kivy.uix.screenmanager import Screen, NoTransition, CardTransition
 from specialbuttons import ImageButton, LabelButton, ImageButtonSelectable
+from kivy.properties import DictProperty
 from workoutbanner import WorkoutBanner
 from functools import partial
 from os import walk
@@ -55,7 +56,7 @@ class MainApp(App):
     previous_workout_image_widget = None
     friends_list = ""
     refresh_token_file = "refresh_token.txt"
-    nicknames = {}  # Dictionary of nicknames for each friend id in friends list
+    nicknames = DictProperty()  # Dictionary of nicknames for each friend id in friends list
     their_friend_id = ""  # Make it so we know which friend's workout screen has been loaded for app.set_friend_nickname
     my_firebase = None  # Reference to class in myfirebase.py
 
@@ -73,12 +74,16 @@ class MainApp(App):
         if nickname == "":
             return
         # Set the nickname
-        self.nicknames[self.their_friend_id] = nickname
+        print("YO", self.their_friend_id, type(self.their_friend_id))
+        print(self.nicknames)
+        self.nicknames[int(self.their_friend_id)] = nickname
 
         # Update firebase
+        print(self.nicknames)
+        print(json.dumps(self.nicknames))
         workout_request = requests.patch("https://friendly-fitness.firebaseio.com/%s/nicknames.json?auth=%s"
                                         %(self.local_id, self.id_token), data=json.dumps(self.nicknames))
-
+        print(workout_request.content)
         # Update the nickname in the friend_workout_screen
         their_friend_id_label = self.root.ids.friend_workout_screen.ids.friend_workout_screen_friend_id
         their_friend_id_label.text = "[u]" + nickname + "[/u]"
@@ -176,20 +181,26 @@ class MainApp(App):
             self.friends_list = data['friends']
 
             # Get nicknames
-            print(data['friends'])
-            print(data['nicknames'])
-            #for i, friend_id in enumerate(self.friends_list.split(",")):
-            #    if friend_id:
-            #        print(i, friend_id)
-            #        self.nicknames[friend_id] = data['nicknames'][i]
-            self.nicknames = data['nicknames']
+            try:
+                print(data['nicknames'])
+                for i, friend_id in enumerate(self.friends_list.split(",")):
+                    print("Fuck", i, friend_id)
+                    if friend_id:
+                        print(i, friend_id)
+                        self.nicknames[friend_id] = data['nicknames'][i]
+            except:
+                self.nicknames = data.get('nicknames', {})
             # Populate friends list grid
             friends_list_array = self.friends_list.split(",")
             for friend_id in friends_list_array:
                 friend_id = friend_id.replace(" ", "")
                 if friend_id == "":
                     continue
-                if friend_id in list(self.nicknames.keys()):
+                try:
+                    nicknames = list(self.friends_list.keys())
+                except:
+                    nicknames = self.nicknames
+                if friend_id in nicknames:
                     friend_id_text = "[u]" + self.nicknames[friend_id] + "[/u]"
                 else:
                     friend_id_text = "[u]Friend ID: " + friend_id + "[/u]"
@@ -282,7 +293,7 @@ class MainApp(App):
             self.root.ids['friends_list_screen'].ids['friends_list_grid'].add_widget(friend_banner)
             # Inform them they added a friend successfully
             self.root.ids['add_friend_screen'].ids['add_friend_label'].text = "Friend ID %s added successfully."%friend_id
-
+        print(self.nicknames)
     def sign_out_user(self):
         # User wants to log out
         with open(self.refresh_token_file, 'w') as f:
@@ -504,7 +515,11 @@ class MainApp(App):
         # Populate their friend ID and nickname
         print("Need to populate nickname")
         their_friend_id_label = self.root.ids.friend_workout_screen.ids.friend_workout_screen_friend_id
-        if friend_id in self.nicknames.keys():
+        try:
+            nicknames = list(self.nicknames.keys())
+        except:
+            nicknames = self.nicknames
+        if friend_id in nicknames:
             their_friend_id_label.text = "[u]" + self.nicknames[friend_id] + "[/u]"
         else:
             their_friend_id_label.text = "[u]Nickname[/u]"

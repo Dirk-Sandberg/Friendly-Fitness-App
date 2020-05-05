@@ -90,7 +90,7 @@ class MyFirebase():
         # Default avatar
         # Friends list
         # Empty workouts area
-        my_data = '{"avatar": "man.png", "friends": "", "workouts": "", "streak": "0", "my_friend_id": %s}' % my_friend_id
+        my_data = '{"avatar": "man.png", "nicknames": {}, "friends": "", "workouts": "", "streak": "0", "my_friend_id": %s}' % my_friend_id
         post_request = UrlRequest("https://friendly-fitness.firebaseio.com/" + app.local_id + ".json?auth=" + app.id_token,
                        req_body=my_data, method='PATCH')
 
