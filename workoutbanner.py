@@ -38,7 +38,8 @@ class WorkoutBanner(GridLayout):
             self.likeable = False
             self.workout_key = ""
 
-        super(WorkoutBanner, self).__init__(**kwargs)
+        #super(WorkoutBanner, self).__init__(**kwargs)
+        super().__init__()#**kwargs)
         with self.canvas.before:
             Color(rgba=(kivy.utils.get_color_from_hex("#6C5B7B"))[:3] + [.5])
             self.rect = Rectangle(size=self.size, pos=self.pos)

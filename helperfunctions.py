@@ -10,9 +10,9 @@ def count_workout_streak(workouts):
     streak = 0
 
     # Make sure workouts are sorted
-    workout_keys = workouts.keys()
+    workout_keys = list(workouts.keys())
     # Sort workouts by date then reverse (we want youngest dates at the start)
-    workout_keys.sort(key=lambda value: datetime.strptime(workouts[value.encode()]['date'].encode('utf-8'), "%m/%d/%Y"))
+    workout_keys.sort(key=lambda value: datetime.strptime(workouts[value]['date'], "%m/%d/%Y"))
     workout_keys = workout_keys[::-1]
 
 

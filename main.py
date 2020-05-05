@@ -158,6 +158,7 @@ class MainApp(App):
             self.id_token = id_token
 
             # Get database data
+            print("LOCAL ID IS", local_id)
             result = requests.get("https://friendly-fitness.firebaseio.com/" + local_id + ".json?auth=" + id_token)
             data = json.loads(result.content.decode())
             print("id token is", id_token)
@@ -203,14 +204,14 @@ class MainApp(App):
             banner_grid = self.root.ids['home_screen'].ids['banner_grid']
             workouts = data['workouts']
             if workouts != "":
-                workout_keys = workouts.keys()
+                workout_keys = list(workouts.keys())
                 streak = helperfunctions.count_workout_streak(workouts)
                 if str(streak) == 0:
                     streak_label.text = "0 Day Streak. Go workout!"
                 else:
                     streak_label.text = str(streak) + " Day Streak!"
                 # Sort workouts by date then reverse (we want youngest dates at the start)
-                workout_keys.sort(key=lambda value : datetime.strptime(workouts[value.encode()]['date'].encode('utf-8'), "%m/%d/%Y"))
+                workout_keys.sort(key=lambda value : datetime.strptime(workouts[value]['date'], "%m/%d/%Y"))
                 workout_keys = workout_keys[::-1]
                 for workout_key in workout_keys:
                     workout = workouts[workout_key]
