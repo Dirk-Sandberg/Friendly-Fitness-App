@@ -176,18 +176,20 @@ class MainApp(App):
             self.friends_list = data['friends']
 
             # Get nicknames
-            try:
-                self.nicknames = data['nicknames']
-            except:
-                self.nicknames = {}
-
+            print(data['friends'])
+            print(data['nicknames'])
+            #for i, friend_id in enumerate(self.friends_list.split(",")):
+            #    if friend_id:
+            #        print(i, friend_id)
+            #        self.nicknames[friend_id] = data['nicknames'][i]
+            self.nicknames = data['nicknames']
             # Populate friends list grid
             friends_list_array = self.friends_list.split(",")
             for friend_id in friends_list_array:
                 friend_id = friend_id.replace(" ", "")
                 if friend_id == "":
                     continue
-                if friend_id in self.nicknames.keys():
+                if friend_id in list(self.nicknames.keys()):
                     friend_id_text = "[u]" + self.nicknames[friend_id] + "[/u]"
                 else:
                     friend_id_text = "[u]Friend ID: " + friend_id + "[/u]"
@@ -262,7 +264,7 @@ class MainApp(App):
             self.root.ids['add_friend_screen'].ids['add_friend_label'].text = "Invalid friend ID"
         else:
             # Requested friend ID exists
-            key = data.keys()[0]
+            key = list(data.keys())[0]
             #new_friend_id = data[key]['my_friend_id']
 
             # Add friend id to friends list and patch new friends list
@@ -486,7 +488,7 @@ class MainApp(App):
         friend_data_req = requests.get('https://friendly-fitness.firebaseio.com/.json?orderBy="my_friend_id"&equalTo=' + friend_id)
 
         friend_data = friend_data_req.json()
-        workouts = friend_data.values()[0]['workouts']
+        workouts = list(friend_data.values())[0]['workouts']
 
         friend_banner_grid = self.root.ids['friend_workout_screen'].ids['friend_banner_grid']
 
@@ -497,7 +499,7 @@ class MainApp(App):
 
         # Populate their avatar image
         friend_avatar_image = self.root.ids.friend_workout_screen.ids.friend_workout_screen_image
-        friend_avatar_image.source = "icons/avatars/" + friend_data.values()[0]['avatar']
+        friend_avatar_image.source = "icons/avatars/" + list(friend_data.values())[0]['avatar']
 
         # Populate their friend ID and nickname
         print("Need to populate nickname")
@@ -515,8 +517,8 @@ class MainApp(App):
             # Change to the friend_workout_screen
             self.change_screen("friend_workout_screen")
             return
-        workout_keys = workouts.keys()
-        workout_keys.sort(key=lambda value: datetime.strptime(workouts[value.encode()]['date'].encode('utf-8'), "%m/%d/%Y"))
+        workout_keys = list(workouts.keys())
+        workout_keys.sort(key=lambda value: datetime.strptime(workouts[value]['date'], "%m/%d/%Y"))
         workout_keys = workout_keys[::-1]
         for workout_key in workout_keys:
             workout = workouts[workout_key]

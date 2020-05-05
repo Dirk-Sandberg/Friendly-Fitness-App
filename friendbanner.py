@@ -11,7 +11,8 @@ from kivy.graphics import Color, Rectangle
 
 class FriendBanner(FloatLayout):
     def __init__(self, **kwargs):
-        super(FriendBanner, self).__init__(**kwargs)
+        #super(FriendBanner, self).__init__(**kwargs)
+        super().__init__()
         with self.canvas.before:
             Color(rgba=(kivy.utils.get_color_from_hex("#6C5B7B"))[:3] + [.5])
             self.rect = Rectangle(size=self.size, pos=self.pos)
@@ -25,7 +26,7 @@ class FriendBanner(FloatLayout):
         check_req = requests.get('https://friendly-fitness.firebaseio.com/.json?orderBy="my_friend_id"&equalTo='
                                  + kwargs['friend_id'])
         data = check_req.json()
-        unique_identifer = data.keys()[0]
+        unique_identifer = list(data.keys())[0]
         their_avatar = data[unique_identifer]['avatar']
         print(their_avatar)
         self.remove_label = LabelButton(size_hint=(.10, 1), pos_hint={"top": 1, "right": .1},

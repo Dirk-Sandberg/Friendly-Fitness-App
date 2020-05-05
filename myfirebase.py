@@ -102,7 +102,7 @@ class MyFirebase():
         # Get their database entry based on their friend id so we can find their local ID
         check_req = requests.get('https://friendly-fitness.firebaseio.com/.json?orderBy="my_friend_id"&equalTo=' + friend_id)
         data = check_req.json()
-        their_local_id = data.keys()[0]
+        their_local_id = list(data.keys())[0]
 
         self.update_likes_patch_req = UrlRequest("https://friendly-fitness.firebaseio.com/%s/workouts/%s.json?auth="%(their_local_id, workout_key) + app.id_token,
                                           req_body=friend_patch_data, method='PATCH', on_success=self.update_likes_ok, on_failure=self.update_likes_ok)
