@@ -11,7 +11,8 @@ class ImageButton(ButtonBehavior, Image):
 
 class ImageButtonSelectable(ButtonBehavior, Image):
     def __init__(self, **kwargs):
-        super(ImageButtonSelectable, self).__init__(**kwargs)
+        #super(ImageButtonSelectable, self).__init__(**kwargs)
+        super().__init__()
         with self.canvas.before:
             self.canvas_color = Color(rgb=(kivy.utils.get_color_from_hex("#35477d")))
             self.rect = RoundedRectangle(size=self.size, pos=self.pos, radius=[5,])
