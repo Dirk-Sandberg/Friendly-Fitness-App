@@ -32,7 +32,7 @@ class MyFirebase():
             # Create new key in database from localId
             # Get friend ID
             # Get request on firebase to get the next friend id
-            self.friend_get_req = UrlRequest("https://friendly-fitness.firebaseio.com/next_friend_id.json?auth=" + idToken, on_success=self.on_friend_get_req_ok, on_error=self.on_error, on_failure=self.on_failure)
+            self.friend_get_req = UrlRequest("https://friendly-fitness.firebaseio.com/next_friend_id.json?auth=" + idToken, on_success=self.on_friend_get_req_ok, on_error=self.on_error, on_failure=self.on_error)
 
         elif sign_up_request.ok == False:
             error_data = json.loads(sign_up_request.content.decode())
