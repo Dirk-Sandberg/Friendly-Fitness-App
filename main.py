@@ -164,6 +164,7 @@ class MainApp(App):
 
             # Get database data
             print("LOCAL ID IS", local_id)
+            print("https://friendly-fitness.firebaseio.com/" + local_id + ".json?auth=" + id_token)
             result = requests.get("https://friendly-fitness.firebaseio.com/" + local_id + ".json?auth=" + id_token)
             data = json.loads(result.content.decode())
             print("id token is", id_token)

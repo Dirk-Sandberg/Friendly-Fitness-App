@@ -32,7 +32,7 @@ class MyFirebase():
             # Create new key in database from localId
             # Get friend ID
             # Get request on firebase to get the next friend id
-            self.friend_get_req = UrlRequest("https://friendly-fitness.firebaseio.com/next_friend_id.json?auth=" + idToken, on_success=self.on_friend_get_req_ok)
+            self.friend_get_req = UrlRequest("https://friendly-fitness.firebaseio.com/next_friend_id.json?auth=" + idToken, on_success=self.on_friend_get_req_ok, on_error=self.on_error, on_failure=self.on_failure)
 
         elif sign_up_request.ok == False:
             error_data = json.loads(sign_up_request.content.decode())
@@ -41,6 +41,10 @@ class MyFirebase():
                 self.sign_in_existing_user(email, password)
             else:
                 app.root.ids['login_screen'].ids['login_message'].text = error_message.replace("_", " ")
+
+    def on_error(self, req, result):
+        print("FAILED TO GET USER DATA")
+        print(result)
 
     def sign_in_existing_user(self, email, password):
         """Called if a user tried to sign up and their email already existed."""
