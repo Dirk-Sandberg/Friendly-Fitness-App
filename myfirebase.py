@@ -2,6 +2,7 @@ import requests
 import json
 from kivy.network.urlrequest import UrlRequest
 from kivy.app import App
+import certifi
 
 class MyFirebase():
     wak = "AIzaSyB49T25fdl4v4vNNycrlLISaRc2Op8-z-Y"  # Web Api Key
@@ -32,7 +33,7 @@ class MyFirebase():
             # Create new key in database from localId
             # Get friend ID
             # Get request on firebase to get the next friend id
-            self.friend_get_req = UrlRequest("https://friendly-fitness.firebaseio.com/next_friend_id.json?auth=" + idToken, on_success=self.on_friend_get_req_ok, on_error=self.on_error, on_failure=self.on_error)
+            self.friend_get_req = UrlRequest("https://friendly-fitness.firebaseio.com/next_friend_id.json?auth=" + idToken, ca_file=certifi.where(), on_success=self.on_friend_get_req_ok, on_error=self.on_error, on_failure=self.on_error)
 
         elif sign_up_request.ok == False:
             error_data = json.loads(sign_up_request.content.decode())
@@ -86,7 +87,7 @@ class MyFirebase():
         app.set_friend_id(my_friend_id)
         friend_patch_data = '{"next_friend_id": %s}' % (my_friend_id+1)
         friend_patch_req = UrlRequest("https://friendly-fitness.firebaseio.com/.json?auth=" + app.id_token,
-                                          req_body=friend_patch_data, method='PATCH')
+                                          req_body=friend_patch_data, ca_file = certifi.where(), method='PATCH')
 
 
         # Update firebase's next friend id field
@@ -95,7 +96,7 @@ class MyFirebase():
         # Friends list
         # Empty workouts area
         my_data = '{"avatar": "man.png", "nicknames": {}, "friends": "", "workouts": "", "streak": "0", "my_friend_id": %s}' % my_friend_id
-        post_request = UrlRequest("https://friendly-fitness.firebaseio.com/" + app.local_id + ".json?auth=" + app.id_token,
+        post_request = UrlRequest("https://friendly-fitness.firebaseio.com/" + app.local_id + ".json?auth=" + app.id_token, ca_file=certifi.where(),
                        req_body=my_data, method='PATCH')
 
         app.change_screen("home_screen")
@@ -109,7 +110,7 @@ class MyFirebase():
         their_local_id = list(data.keys())[0]
 
         self.update_likes_patch_req = UrlRequest("https://friendly-fitness.firebaseio.com/%s/workouts/%s.json?auth="%(their_local_id, workout_key) + app.id_token,
-                                          req_body=friend_patch_data, method='PATCH', on_success=self.update_likes_ok, on_failure=self.update_likes_ok)
+                                          req_body=friend_patch_data, ca_file=certifi.where(), method='PATCH', on_success=self.update_likes_ok, on_failure=self.update_likes_ok)
 
     def update_likes_ok(self, *args):
         print(self.update_likes_patch_req.result)
