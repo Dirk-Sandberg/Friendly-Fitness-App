@@ -185,7 +185,6 @@ class MainApp(App):
             try:
                 print(data['nicknames'])
                 for i, friend_id in enumerate(self.friends_list.split(",")):
-                    print("Fuck", i, friend_id)
                     if friend_id:
                         print(i, friend_id)
                         self.nicknames[friend_id] = data['nicknames'][i]
